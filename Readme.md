@@ -55,3 +55,49 @@ docker-compose up --build
 API specification can be found [here](api/myweather.com.yml)
 
 You can use [Swagger Editor](https://editor.swagger.io/) to view and/or edit the file.
+
+## Environment and version information
+
+**npm**
+```
+$ npm --version
+8.1.2
+```
+
+**java**
+```
+$ java --version
+openjdk 11.0.11 2021-04-20
+OpenJDK Runtime Environment (build 11.0.11+9-Ubuntu-0ubuntu2.20.04)
+OpenJDK 64-Bit Server VM (build 11.0.11+9-Ubuntu-0ubuntu2.20.04, mixed mode, sharing)
+```
+
+**Gradle**
+```
+$ ./gradlew --version
+
+------------------------------------------------------------
+Gradle 7.4.1
+------------------------------------------------------------
+
+Build time:   2022-03-09 15:04:47 UTC
+Revision:     36dc52588e09b4b72f2010bc07599e0ee0434e2e
+
+Kotlin:       1.5.31
+Groovy:       3.0.9
+Ant:          Apache Ant(TM) version 1.10.11 compiled on July 10 2021
+JVM:          11.0.11 (Ubuntu 11.0.11+9-Ubuntu-0ubuntu2.20.04)
+OS:           Linux 4.4.0-19041-Microsoft amd64
+```
+
+**docker**
+```
+$ docker --version
+Docker version 20.10.10, build b485636
+```
+
+***docker-compose***
+```
+$ docker-compose --version
+docker-compose version 1.25.0, build unknown
+```
