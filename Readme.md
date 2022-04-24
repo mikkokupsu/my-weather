@@ -24,6 +24,11 @@ docker run -it -p 8000:8000 amazon/dynamodb-local
 AWS_ACCESS_KEY_ID='a' AWS_SECRET_ACCESS_KEY='b' AWS_DYNAMODB_LOCAL_ADDRESS='http://localhost:8000' ./gradlew bootRun
 ```
 
+**To run unit tests**
+```
+./gradlew test
+```
+
 ## Frontend
 
 Project developed with React and dependencies are handled with npm.
