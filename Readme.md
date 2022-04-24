@@ -6,6 +6,8 @@ MyWeather is a fictitious website that provides air temperature data to the cust
 
 Project is composed of backend and frontend.
 
+See section *API specification* for more details about the backend API.
+
 ## Backend
 
 Project developed with Java and dependencies are handled with Gradle.
@@ -42,3 +44,9 @@ docker-compose up
 ```
 docker-compose up --build
 ```
+
+## API specification
+
+API specification can be found [here](api/myweather.com.yml)
+
+You can use [Swagger Editor](https://editor.swagger.io/) to view and/or edit the file.
