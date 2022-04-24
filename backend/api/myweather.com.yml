@@ -1,0 +1,245 @@
+---
+openapi: 3.0.3
+info:
+  title: MyWeather API
+  description: API to fetch and store weather data.
+  version: 1.0.0
+servers:
+  - description: 'Localhost'
+    url: http://localhost:8080
+paths:
+  /login:
+    description: Endpoint to login.
+    post:
+      security: []
+      tags:
+        - Login
+      summary: Login to API and retrieve access token.
+      description: |
+        Login to API and retrieve access token to be used for other endpoints.
+      operationId: login
+      requestBody:
+        $ref: '#/components/requestBodies/login'
+      responses:
+        200:
+          description: Successful login.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        401:
+          $ref: '#/components/responses/authenticationFailed'
+  /temperature/air:
+    description: Endpoint for air temperature(s).
+    post:
+      tags:
+        - Air temperature
+      summary: Create an air temperature measurement to a given location.
+      description: |
+        Create or update an air temperature measurement to a given location.
+
+        An existing air temperature is defined by location and timestamp fields.
+      operationId: postTemperatureAir
+      requestBody:
+        $ref: '#/components/requestBodies/airTemperature'
+      responses:
+        200:
+          $ref: '#/components/responses/airTemperature'
+        400:
+          $ref: '#/components/responses/invalidRequest'
+        401:
+          $ref: '#/components/responses/authenticationFailed'
+        500:
+          $ref: '#/components/responses/serverError'
+    get:
+      tags:
+        - Air temperature
+      summary: Get one or many air temperature measurements.
+      description: |
+        Get one or many air temperature measurements using one or many locations
+        and time range. Start timestamp is inclusive and stop timestamp is exclusive.
+      operationId: getTemperatureAir
+      parameters:
+        - name: location
+          in: query
+          required: true
+          description: Name of the location.
+          example: 'Kaisaniemi'
+          schema:
+            type: string
+        - name: start
+          in: query
+          required: true
+          description: Inclusive start time in format yyyy-mm-ddThh:mm:ss.
+          example: '2022-04-18T12:00:00'
+          schema:
+            type: string
+            format: date-time
+        - name: stop
+          in: query
+          required: true
+          description: Inclusive stop time in format yyyy-mm-ddThh:mm:ss.
+          example: '2022-04-12T13:00:00'
+          schema:
+            type: string
+            format: date-time
+      responses:
+        200:
+          description: List of air temperatures for given location.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/airTemperature'
+        400:
+          $ref: '#/components/responses/invalidRequest'
+        401:
+          $ref: '#/components/responses/authenticationFailed'
+        500:
+          $ref: '#/components/responses/serverError'
+  /temperature/air/{location}/{timestamp}:
+    put:
+      tags:
+        - Air temperature
+      summary: Update an existing air temperature measurement.
+      description: |
+        Update an existing air temperature measurement.
+
+        If the meaasurement does not exist, return an 404 error.
+      operationId: updateTemperatureAir
+      requestBody:
+        $ref: '#/components/requestBodies/airTemperature'
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/timestamp'
+      responses:
+        200:
+          $ref: '#/components/responses/airTemperature'
+        400:
+          $ref: '#/components/responses/invalidRequest'
+        401:
+          $ref: '#/components/responses/authenticationFailed'
+        404:
+          $ref: '#/components/responses/notFound'
+        500:
+          $ref: '#/components/responses/serverError'
+    delete:
+      tags:
+        - Air temperature
+      summary: Delete an existing air temperature measurement.
+      description: |
+        Delete an existing air temperature measurement.
+
+        If the meaasurement does not exist, return an 404 error.
+      operationId: deleteTemperatureAir
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/timestamp'
+      responses:
+        200:
+          $ref: '#/components/responses/airTemperature'
+        400:
+          $ref: '#/components/responses/invalidRequest'
+        401:
+          $ref: '#/components/responses/authenticationFailed'
+        404:
+          $ref: '#/components/responses/notFound'
+        500:
+          $ref: '#/components/responses/serverError'
+components:
+  schemas:
+    token:
+      type: object
+      properties:
+        access_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\
+            .eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ\
+            .SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+    airTemperature:
+      type: object
+      properties:
+        location:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+          description: Format yyyy-mm-ddThh:mm:ss.
+        value:
+          type: number
+          format: double
+      example:
+        location: Kaisaniemi
+        timestamp: '2022-04-18T12:10:00'
+        value: 20.5
+  responses:
+    invalidRequest:
+      description: Request validation failed.
+    airTemperature:
+      description: A single air temperature measurement.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/airTemperature'
+    notFound:
+      description: |
+        An air temperature measurement was not found with given location and timestamp.
+    serverError:
+      description: |
+        Something went wrong on server-side while handling request.
+    authenticationFailed:
+      description: |
+        Authentication failed.
+  parameters:
+    start_timestamp:
+      name: start
+      in: query
+      schema:
+        type: string
+        format: date-time
+    location:
+      name: location
+      in: path
+      schema:
+        type: string
+      example: Kaisaniemi
+      required: true
+    timestamp:
+      name: timestamp
+      in: path
+      schema:
+        type: string
+      example: '2022-04-18T12.10:00'
+      required: true
+      description: Format yyyy-mm-ddThh:mm:ss.
+  requestBodies:
+    login:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: username
+              password:
+                type: string
+                example: password
+            required:
+              - username
+              - password
+    airTemperature:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/airTemperature'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+ - bearerAuth: []
+tags:
+  - name: MyWeather
