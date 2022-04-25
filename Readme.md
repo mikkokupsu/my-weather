@@ -54,7 +54,7 @@ docker-compose up --build
 
 API specification can be found [here](api/myweather.com.yml)
 
-You can use [Swagger Editor](https://editor.swagger.io/) to view and/or edit the file.
+You can use [Swagger Editor](https://editor.swagger.io/?url=https://raw.githubusercontent.com/mikkokupsu/my-weather/main/api/myweather.com.yml) to view and/or edit the file.
 
 ## Environment and version information
 
