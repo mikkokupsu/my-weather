@@ -75,40 +75,41 @@ public class MyWeatherBackendApplication {
 	}
 
 	private static void createTestData(final AmazonDynamoDB client) throws Exception {
-		final Resource testDataResource = new ClassPathResource("kaisaniemi_202204_1.csv");
-		final Scanner scanner = new Scanner(testDataResource.getFile());
 		final List<WriteRequest> writeRequests = new ArrayList<>();
-		boolean first = true;
-		try {
-			while (scanner.hasNextLine()) {
-				final String[] parts = scanner.nextLine().strip().split(",");
-				if (first || parts.length != 6) {
-					// Skip header or not enough fields
-					first = false;
-					continue;
+		String[] files = new String[] {
+			"harmaja_202202_1.csv", "helsingin_majakka_202202_1.csv", "kaisaniemi_202202_1.csv",
+			"kumpula_202202_1.csv", "malmin_lentokentta_202202_1.csv", "vuosaari_satama_202202_1.csv"};
+		for (String file : files) {
+			final Resource testDataResource = new ClassPathResource(file);
+			final Scanner scanner = new Scanner(testDataResource.getFile());
+			try {
+				while (scanner.hasNextLine()) {
+					final String[] parts = scanner.nextLine().strip().split(",");
+					if (parts.length < 7) {
+						continue;
+					}
+					String hour = parts[4].replace(":00", "");
+					if (hour.startsWith("0")) {
+						// Remove leading zero
+						hour = hour.substring(1);
+					}
+
+					final LocalDateTime timestamp = LocalDateTime.of(
+						Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(parts[3]), Integer.parseInt(hour), 0, 0);
+					final float value = Float.parseFloat(parts[6]);
+					final String location = parts[0];
+
+					Map<String, AttributeValue> item = new HashMap<>();
+					item.put("Pk", new AttributeValue(location));
+					item.put("Sk", new AttributeValue(timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
+					item.put("value", new AttributeValue().withN(String.valueOf(value)));
+
+					writeRequests.add(new WriteRequest(new PutRequest(item)));
 				}
-				
-				String hour = parts[3].replace(":00", "");
-				if (hour.startsWith("0")) {
-					// Remove leading zero
-					hour = hour.substring(1);
-				}
-
-				final LocalDateTime timestamp = LocalDateTime.of(
-					Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Integer.parseInt(hour), 0, 0);
-				final float value = Float.parseFloat(parts[5]);
-				final String location = "Kaisaniemi";
-
-				Map<String, AttributeValue> item = new HashMap<>();
-				item.put("Pk", new AttributeValue(location));
-				item.put("Sk", new AttributeValue(timestamp.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
-				item.put("value", new AttributeValue().withN(String.valueOf(value)));
-
-				writeRequests.add(new WriteRequest(new PutRequest(item)));
 			}
-		}
-		finally {
-			scanner.close();
+			finally {
+				scanner.close();
+			}
 		}
 
 		for (List<WriteRequest> batch : ListUtils.partition(writeRequests, 10)) {
