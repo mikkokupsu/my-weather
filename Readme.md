@@ -38,7 +38,10 @@ Project developed with React and dependencies are handled with npm.
 npm start
 ```
 
-## Docker compose
+## Running the services with Docker compose
+
+You can build and run the service, including the database, with `docker-compose`.
+Once you have the stack up and running, navigate to http://localhost:3000 to view the UI.
 
 **Start service in Docker containers**
 ```
